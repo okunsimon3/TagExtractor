@@ -102,15 +102,24 @@ public class TagExtractorGUI extends JFrame {
             int result = saveFileChooser.showSaveDialog(TagExtractorGUI.this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File outputFile = saveFileChooser.getSelectedFile();
-                try (PrintWriter writer = new PrintWriter(outputFile)) {
+                PrintWriter writer = null;
+                try {
+                    writer = new PrintWriter(outputFile);
                     for (Map.Entry<String, Integer> entry : tagFrequencyMap.entrySet()) {
-                        writer.println(entry.getKey() + ": " + entry.getValue());
+                        writer.println(entry.getKey() + " " + entry.getValue());
                     }
-                    System.exit(0);
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(TagExtractorGUI.this, "Error saving tags to file",
                             "Error", JOptionPane.ERROR_MESSAGE);
+                    return; // Exit the listener if saving fails
+                } finally {
+                    if (writer != null) {
+                        writer.close(); // Ensure the writer is closed
+                    }
                 }
+
+                // Exit the program after the file is saved
+                System.exit(0);
             }
         }
     }
